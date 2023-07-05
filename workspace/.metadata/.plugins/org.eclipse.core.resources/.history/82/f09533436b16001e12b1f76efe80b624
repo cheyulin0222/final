@@ -1,0 +1,126 @@
+package com.example.demo.model;
+
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
+
+import org.springframework.format.annotation.DateTimeFormat;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.Table;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
+import jakarta.persistence.Transient;
+
+@Entity
+@Table(name = "postcommentcomment")
+public class PostCommentComment {
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Integer postCommentCommentId;
+
+	private String text;
+
+	@DateTimeFormat(pattern = "yyyy/MM/dd HH:mm:ss")
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date date;
+	
+	@Transient
+	private Integer myLikeId;
+
+
+	
+	@JsonIgnoreProperties({"email", "password", "role"})
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "memberid")
+	private Member member;
+
+	@JsonIgnoreProperties("postCommentComments")
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "postcommentid")
+	private PostComment postComment;
+	
+	@JsonIgnoreProperties("postCommentComment")
+	@OneToMany(mappedBy = "postCommentComment", cascade = CascadeType.ALL)
+	private Set<PostCommentCommentLike> postCommentCommentLikes = new HashSet<>();
+
+	@PrePersist
+	public void onCreate() {
+		if (date == null)
+			date = new Date();
+	}
+
+	public Integer getMyLikeId() {
+		return myLikeId;
+	}
+
+	public void setMyLikeId(Integer myLikeId) {
+		this.myLikeId = myLikeId;
+	}
+	
+	public PostCommentComment() {
+	}
+
+	public Integer getPostCommentCommentId() {
+		return postCommentCommentId;
+	}
+
+	public void setPostCommentCommentId(Integer postCommentCommentId) {
+		this.postCommentCommentId = postCommentCommentId;
+	}
+
+	public String getText() {
+		return text;
+	}
+
+	public void setText(String text) {
+		this.text = text;
+	}
+
+	public Date getDate() {
+		return date;
+	}
+
+	public void setDate(Date date) {
+		this.date = date;
+	}
+
+	public Member getMember() {
+		return member;
+	}
+
+	public void setMember(Member member) {
+		this.member = member;
+	}
+
+	public PostComment getPostComment() {
+		return postComment;
+	}
+
+	public void setPostComment(PostComment postComment) {
+		this.postComment = postComment;
+	}
+
+	public Set<PostCommentCommentLike> getPostCommentCommentLikes() {
+		return postCommentCommentLikes;
+	}
+
+	public void setPostCommentCommentLikes(Set<PostCommentCommentLike> postCommentCommentLikes) {
+		this.postCommentCommentLikes = postCommentCommentLikes;
+	}
+	
+	
+
+}

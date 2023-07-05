@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+
+<title>首頁</title>
+</head>
+<body>
+<div th:replace="~{components/navbar}"></div>
+
+<main>
+<div class="container">
+
+	<div>
+	    <img id="add" type="button" class="icon"  th:src="@{/img/icon/add.png}" data-bs-toggle="modal" data-bs-target="#addModal">
+	</div>
+	
+<div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered">
+    	<div class="modal-content">
+             
+        	<div class="modal-header">
+            	<h5 class="modal-title" id="exampleModalLabel">新增貼文</h5>
+             	<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+             
+             <form th:action="@{/post/add}" method="post" enctype="multipart/form-data">
+             	<div class="modal-body">
+             		<div>
+             			<input class="form-control" name="location" type="text" placeholder="請輸入您的位置" />
+             		</div>
+                 	<div>
+                    	<textarea class="form-control" name="text" type="text" id="exampleFormControlTextarea1" rows="1" placeholder="留言......"></textarea>
+                 	</div>
+                 	<div>
+                    	<input name="file" type="file" />
+                 	</div>
+             	</div>
+             	
+             	<div class="modal-footer">
+             		<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+            		<button type="submit" class="btn btn-primary">發佈</button>
+             	 </div>
+             </form>
+         
+    	</div>
+	</div>
+</div> 
+
+<th:block th:each=" post : ${postList}">
+
+<!-- CARD -->
+<div class="card border-0">
+	
+<!-- HEADER -->
+<div class="card-header justify-content-between align-items-center">
+	<div class="user-profile">
+		<div class="field-content">
+	    	<img class="circleImg" th:src="@{'/member/getPhoto?id=' + ${post.member.memberId}}" />
+	    </div>
+        <div class="user-info">
+       		<p class="test-title" th:text="${post.member.firstName}"></p>
+           	<p class="test" th:text="${post.location}"></p>
+        </div>
+	</div>
+	<div class="test-title" type="button" data-bs-toggle="modal" data-bs-target="#moreModal">
+		<img class="icon" th:src="@{/img/icon/more.png}">
+	</div>
+</div>
+
+
+<!-- IMAGE SLIDE -->
+<div id="carouselExampleFade" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="false" style="width: 460px; height: 460px;">
+<!-- IMAGE -->
+	<div class="carousel-inner">
+		<th:block th:each=" photo : ${post.postPhotos}">
+	    	<div class="carousel-item active">
+	        	<img th:src="@{'/postPhoto/getPhoto?id=' + ${photo.postPhotoId}}" class="d-block w-100 testaaa" alt="...">
+	        </div>
+        </th:block>
+	</div>
+<!-- BUTTON -->
+	<button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleFade" data-bs-slide="prev">
+	    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+	    <span class="visually-hidden">Previous</span>
+    </button>
+	<button class="carousel-control-next" type="button" data-bs-target="#carouselExampleFade" data-bs-slide="next">
+		<span class="carousel-control-next-icon" aria-hidden="true"></span>
+		<span class="visually-hidden">Next</span>
+    </button>
+</div>
+
+<!-- CARD BODY -->
+<div class="card-body">
+
+<!-- BAR -->
+<div class="icon-bar">
+	<div class="front-icons card-item">
+			<th:block th:switch="${post.myLikeId == null}">
+	    		<a th:case=${false} th:href="@{'/postLike/delete?postLikeId=' + ${post.myLikeId}}"><img id="heart" class="icon"  th:src="@{/img/icon/heartClick.png}"></a>
+				<a th:case=${true} th:href="@{'/postLike/add?memberId=' + ${session.loginMember.memberId} + '&postId=' + ${post.postId}}"><img id="heart" class="icon"  th:src="@{/img/icon/heart.png}"></a>
+			</th:block>
+        <img id="comment" class="icon" th:src="@{/img/icon/speech-bubble.png}" type="button" data-bs-toggle="modal" data-bs-target="#exampleModal">
+        <img id="send" type="button" class="icon" th:src="@{/img/icon/send.png}" />
+    </div>
+    <div class="" type="button">
+    	<img class="icon" th:src="@{/img/icon/save-instagram.png}">
+    </div>
+</div>
+
+<!-- LIKE -->
+<div class="like card-item">
+	<p class="test-title" th:text="${post.postLikes.size()} + '個讚'"></p>
+</div>
+
+<!-- TEXT -->
+<div class="post-content card-item">
+	<p class="test-title"><span th:text="${post.member.firstName} + ' '"></span>[[${post.text}]]</p>
+</div>
+
+<!-- TAG -->
+<div class="tag card-item">
+	<p class="test-title">#dog</p>
+</div>
+
+<!-- CHECK COMMENT -->
+<div>
+	<form>
+		<input type="hidden" th:value="${post.postId}">
+		<button class="test-title" th:onclick="requestComment(event);" data-bs-toggle="modal" data-bs-target="#postModal">查看留言</button>
+	</form>
+</div>
+
+
+
+<!-- <div class="comment card-item">
+	<th:block th:each=" comment : ${post.postComments}">
+		<p th:text="${comment.text}"></p>
+		<th:block th:switch="${comment.myLikeId == null}">
+	    	<a th:case=${false} th:href="@{'/postCommentLike/delete?postCommentLikeId=' + ${comment.myLikeId}}"><img id="heart" class="icon"  th:src="@{/img/icon/heartClick.png}"></a>
+			<a th:case=${true} th:href="@{'/postCommentLike/add?memberId=' + ${session.loginMember.memberId} + '&postCommentId=' + ${comment.postCommentId}}"><img id="heart" class="icon"  th:src="@{/img/icon/heart.png}"></a>
+		</th:block>
+		<form th:action="@{/postCommentComment/post}" method="post">
+		<input type="hidden" name="postCommentId" th:value="${comment.postCommentId}" />
+    	<textarea name="text" class="form-control" id="exampleFormControlTextarea1" rows="1" placeholder="留言......"></textarea>
+        <div>
+			<button type="submit" style="background-color:transparent; border: none; ">發佈</button>
+		</div>
+    </form>
+    	<th:block th:each=" commentComment : ${comment.postCommentComments}">
+    		<p th:text="${commentComment.text}"></p>
+    		<th:block th:switch="${commentComment.myLikeId == null}">
+	    		<a th:case=${false} th:href="@{'/postCommentCommentLike/delete?postLikeId=' + ${post.myLikeId}}"><img id="heart" class="icon"  th:src="@{/img/icon/heartClick.png}"></a>
+				<a th:case=${true} th:href="@{'/postCommentCommentLike/add?memberId=' + ${session.loginMember.memberId} + '&postId=' + ${post.postId}}"><img id="heart" class="icon"  th:src="@{/img/icon/heart.png}"></a>
+			</th:block>
+    	</th:block>
+	</th:block>
+</div> -->
+
+
+<!-- HAVE A COMMENT -->
+<div class="form card-item">
+	<form th:action="@{/postComment/post}" method="post">
+		<input type="hidden" name="postId" th:value="${post.postId}" />
+    	<textarea name="text" class="form-control" id="exampleFormControlTextarea1" rows="1" placeholder="留言......"></textarea>
+                    
+        <div>
+			<button type="submit" style="background-color:transparent; border: none; ">發佈</button>
+		</div>
+    </form>
+</div>
+
+
+</div>
+
+</div>
+
+<!-- MORE MODAL -->
+<div class="modal fade" id="moreModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered">
+    	<div class="modal-content">
+        	<div class="modal-header">
+             	<h5 class="modal-title" id="exampleModalLabel">More</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+                    
+            <div class="modal-body">
+            	...
+            </div>
+            
+            <div class="modal-footer">
+            	<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Save changes</button>
+            </div>
+    	</div>
+	</div>
+</div> 
+
+<!-- POST MODAL -->
+<div class="modal fade" id="postModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered">
+    	<div class="modal-content">
+    	
+    		<div id="carouselExampleFade" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="false" style="width: 500px; height: 500px;">
+		<!-- IMAGE -->
+				<div id="post-photo-container" class="carousel-inner"></div>
+		<!-- BUTTON -->
+				<button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleFade" data-bs-slide="prev">
+			    	<span class="carousel-control-prev-icon" aria-hidden="true"></span>
+			    	<span class="visually-hidden">Previous</span>
+		   		 </button>
+				<button class="carousel-control-next" type="button" data-bs-target="#carouselExampleFade" data-bs-slide="next">
+					<span class="carousel-control-next-icon" aria-hidden="true"></span>
+					<span class="visually-hidden">Next</span>
+		    	</button>
+			</div>
+    		
+	        <div class="modal-header justify-content-between align-items-center">
+	            	<!-- <h5 class="modal-title" id="exampleModalLabel">新增貼文</h5> -->
+	             	<!-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> -->
+	             	
+					<div class="user-profile">
+						<div id="post-user-photo"></div>
+				        <div id="post-user-info" class="user-info"></div>
+					</div>
+					<div class="test-title" type="button" data-bs-toggle="modal" data-bs-target="#moreModal">
+						<img class="icon" th:src="@{/img/icon/more.png}">
+					</div>
+	            </div>
+	             
+	        <div id="postModalContent" class="modal-body">
+					<div class="mytable" id="list_table_json"></div>
+	           	</div>
+	           	
+	        <div id="postModalFooter" class="modal-footer"></div>
+    		
+    	</div>
+	</div>
+</div> 
+		
+	
+</th:block>
+
+
+
+
+          
+</div>
+</main>
+<script th:src="@{/js/postComment.js}" type="text/javascript"></script>
+<script th:src="@{/js/addPostComment.js}" type="text/javascript"></script>
+
+</body>
+</html>

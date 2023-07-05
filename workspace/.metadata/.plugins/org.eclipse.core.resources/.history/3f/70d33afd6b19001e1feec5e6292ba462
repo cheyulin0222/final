@@ -1,0 +1,26 @@
+package com.example.demo.service;
+
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
+import com.example.demo.model.Follow;
+import com.example.demo.model.FollowRepository;
+
+import lombok.RequiredArgsConstructor;
+
+@Service
+@RequiredArgsConstructor
+public class FollowService {
+
+	private final FollowRepository fDao;
+	
+	public List<Integer> findByFollowerid(Integer memberid) {
+		List<Follow> list = fDao.findByFollowerid(memberid);
+		
+		Integer[] followingList;
+		for (Follow follow : list) 
+			followingList.
+	}
+	
+}

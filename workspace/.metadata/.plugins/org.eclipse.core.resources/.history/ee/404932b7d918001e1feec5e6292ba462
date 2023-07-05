@@ -1,0 +1,36 @@
+package com.example.demo.service;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.NonNull;
+import org.springframework.stereotype.Service;
+
+import com.example.demo.config.JwtService;
+import com.example.demo.model.MemberRepository;
+import com.example.demo.model.PostComment;
+import com.example.demo.model.PostCommentComment;
+import com.example.demo.model.PostCommentCommentRepository;
+
+import jakarta.servlet.http.HttpServletRequest;
+
+@Service
+public class PostCommentCommentService {
+
+	@Autowired
+	private PostCommentCommentRepository pDao;
+	@Autowired
+	private JwtService jwtService;
+	@Autowired
+	private MemberRepository mDao;
+	
+	public PostCommentComment add(PostComment postCommentComment, @NonNull HttpServletRequest request) {
+		
+		final String authHeader = request.getHeader("Authorization");
+		final String jwt = authHeader.substring(7);
+		final String useremail = jwtService.extractUsername(jwt);
+		var member = mDao.findByEmail(useremail)
+				.orElseThrow();
+		postCommentComment.setMember(member);
+		
+		return pDao.save(postCommentComment);
+	}
+}

@@ -1,0 +1,20 @@
+package com.example.demo.model;
+
+import java.util.Date;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+public class PostLikeDTO {
+
+	private Integer postId;
+	private Integer memberId;
+	private Date date;
+	
+}

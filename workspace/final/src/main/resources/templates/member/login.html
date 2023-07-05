@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+
+<title>登入</title>
+<style>
+        * {
+            margin: 0;
+        }
+
+        header {
+            margin-bottom: 75px;
+        }
+      
+      
+        footer {
+            position: absolute;
+            width: 100vw;
+            bottom : 0;
+        }
+         
+
+        .row {
+            padding-top: 20vh;
+            padding-left:0;
+            padding-right: 0;
+            margin: 0;
+            top: 100vh; 
+        }
+   
+        .signin-btn {
+  			margin: 10px;
+  		}
+  		
+        .btn-primary {
+  			width:10em;
+  		}
+      
+        .form-control {
+            width: 400px;
+            margin: auto;
+        }
+        
+        .btn {
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+	<div th:replace="~{components/navbar}"></div>
+
+	<main>
+		<div class="container">
+			<form th:action="@{/member/getMyAccount}" method="post">
+				<div class="row login g-2">
+					<div class="text-center">
+						<input type="text" class="form-control" placeholder="電子郵件地址"
+							name="account">
+					</div>
+					<div class="text-center">
+						<input type="password" class="form-control" placeholder="密碼"
+							name="password">
+					</div>
+					<div class="text-center">
+						<button type="submit" class="btn btn-primary form-control">登入</button>
+					</div>
+					<div class="text-center">
+						<div
+							style="border-bottom: solid lightgray 1px; width: 400px; margin: auto;"
+							class=""></div>
+					</div>
+					<div class="g-2">
+						<div class="text-center">
+							<a class="btn btn-primary"  th:href="@{/member/signup}">註冊</a>
+						</div>
+					</div>
+				</div>
+			</form>
+		</div>
+
+	</main>
+
+</body>
+</html>

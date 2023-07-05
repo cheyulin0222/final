@@ -1,0 +1,42 @@
+package com.example.demo.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+
+import com.example.demo.model.Member;
+import com.example.demo.model.PostComment;
+import com.example.demo.model.PostCommentLike;
+import com.example.demo.service.PostCommentLikeService;
+
+@Controller
+public class PostCommentLikeController {
+
+	@Autowired
+	private PostCommentLikeService pService;
+	
+	@GetMapping("/postCommentLike/add")
+	public String add(Integer memberId, Integer postCommentId) {
+		Member member = new Member();
+		member.setMemberId(memberId);
+		
+		PostComment comment = new PostComment();
+		comment.setPostCommentId(postCommentId);
+		
+		PostCommentLike like = new PostCommentLike();
+		
+		like.setMember(member);
+		like.setPostComment(comment);
+		
+		pService.insert(like);
+		
+		return "redirect:/post/getAll";
+	}
+	
+	@GetMapping("/postCommentLike/delete")
+	public String delete(Integer postCommentLikeId) {
+		pService.deleteById(postCommentLikeId);
+		
+		return "redirect:/post/getAll";
+	}
+}

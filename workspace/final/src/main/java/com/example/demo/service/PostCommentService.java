@@ -1,0 +1,90 @@
+package com.example.demo.service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.NonNull;
+import org.springframework.stereotype.Service;
+
+import com.example.demo.config.JwtService;
+import com.example.demo.model.MemberRepository;
+import com.example.demo.model.PostComment;
+import com.example.demo.model.PostCommentDTO;
+import com.example.demo.model.PostCommentLike;
+import com.example.demo.model.PostCommentRepository;
+
+import jakarta.servlet.http.HttpServletRequest;
+
+@Service
+public class PostCommentService {
+
+	@Autowired
+	private PostCommentRepository pDao;
+	
+	@Autowired
+	private JwtService jwtService;
+	
+	@Autowired
+	private MemberRepository mDao;
+	
+	
+	
+	
+	public PostComment add(PostComment postComment, @NonNull HttpServletRequest request) {
+		
+		final String authHeader = request.getHeader("Authorization");
+		final String jwt = authHeader.substring(7);
+		final String useremail = jwtService.extractUsername(jwt);
+		var member = mDao.findByEmail(useremail)
+				.orElseThrow();
+		postComment.setMember(member);
+		
+		return pDao.save(postComment);
+	}
+	
+	public List<PostComment> findByPostId(Integer postId) {
+		return pDao.findPostCmmentListByPostId(postId);
+	}
+	
+	public PostComment findById(Integer id) {
+		Optional<PostComment> option = pDao.findById(id);
+		return option.get();
+	}
+	
+	public List<PostCommentDTO> findPostCommentByPostId(Integer postId, @NonNull HttpServletRequest request) {
+		final String authHeader = request.getHeader("Authorization");
+		final String jwt = authHeader.substring(7);
+		final String useremail = jwtService.extractUsername(jwt);
+		var member = mDao.findByEmail(useremail)
+				.orElseThrow();
+		Integer memberid = member.getMemberId();
+		
+		
+		
+		List<PostCommentDTO> newList = new ArrayList<PostCommentDTO>();
+		
+		List<PostComment> oldList = pDao.findPostCmmentListByPostId(postId);
+		for (PostComment comment: oldList) {
+			for (PostCommentLike like : comment.getPostCommentLikes()) {
+				if (memberid == like.getMember().getMemberId()) {
+					comment.setMyLikeId(like.getPostCommentLikeId());
+				}
+			}
+			PostCommentDTO newComment = PostCommentDTO.builder()
+				.postCommentId(comment.getPostCommentId())
+				.text(comment.getText())
+				.date(comment.getDate())
+				.myLikeId(comment.getMyLikeId())
+				.replyAmount(comment.getPostCommentComments().size())
+				.postCommentComments(new ArrayList<>())
+				.firstname(comment.getMember().getFirstname())
+				.memberPhoto(comment.getMember().getMemberPhoto())
+				.build();
+			newList.add(newComment);
+		}
+		return newList;
+	}
+	
+}

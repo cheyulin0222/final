@@ -1,0 +1,105 @@
+package com.example.demo.service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.NonNull;
+import org.springframework.stereotype.Service;
+
+import com.example.demo.model.Post;
+import com.example.demo.model.PostDTO;
+import com.example.demo.model.PostLike;
+import com.example.demo.model.PostPhoto;
+import com.example.demo.model.PostPhotoDTO;
+import com.example.demo.model.PostRepository;
+
+import jakarta.servlet.http.HttpServletRequest;
+
+@Service
+public class PostService {
+	
+	@Autowired
+	private PostRepository pDao;
+	
+	@Autowired
+	private MemberService mService;
+	
+	public Post insertPost(Post post) {
+		return pDao.save(post);
+	}
+	
+	public PostDTO findPostById(Integer id) {
+		
+		
+		Optional<Post> option = pDao.findById(id);
+		
+		if (option.isPresent()) {
+			
+			Post oldPost = option.get();
+			
+			List<PostPhotoDTO>  photoList = new ArrayList<PostPhotoDTO>();
+			for (PostPhoto postPhoto : oldPost.getPostPhotos()) {
+				PostPhotoDTO build = PostPhotoDTO.builder()
+					.postPhotoId(postPhoto.getPostPhotoId())
+					.postPhotoFile(postPhoto.getPostPhotoFile())
+					.build();
+				
+				photoList.add(build);
+			}
+			
+			return PostDTO.builder()
+				.postId(oldPost.getPostId())
+				.location(oldPost.getLocation())
+				.firstname(oldPost.getMember().getFirstname())
+				.memberPhoto(oldPost.getMember().getMemberPhoto())
+				.postPhotoDTOs(photoList)
+				.build();
+				
+		}
+		
+		return null;
+	}
+	
+	public List<PostDTO> getAll(@NonNull HttpServletRequest request) {
+		Integer memberid = mService.findIdByJwt(request);
+		
+		List<Post> oldList = pDao.findAll();
+		
+		ArrayList<PostDTO> list = new ArrayList<PostDTO>();
+		
+		for (Post post : oldList) {
+			List<PostPhotoDTO> photos = new ArrayList<PostPhotoDTO>();
+			for (PostPhoto photo : post.getPostPhotos()) {
+				PostPhotoDTO build = PostPhotoDTO.builder()
+					.postPhotoId(photo.getPostPhotoId())
+					.postPhotoFile(photo.getPostPhotoFile())
+					.build();
+				photos.add(build);
+				
+			}
+			
+			for (PostLike like : post.getPostLikes()) {
+				if (memberid == like.getMember().getMemberId()) {
+					post.setMyLikeId(like.getPostLikeId());
+				}
+			}
+			
+			PostDTO build = PostDTO.builder()
+					.postId(post.getPostId())
+					.location(post.getLocation())
+					.firstname(post.getMember().getFirstname())
+					.myLikeId(post.getMyLikeId())
+					.likeAmount(post.getPostLikes().size())
+					.text(post.getText())
+					.memberPhoto(post.getMember().getMemberPhoto())
+					.postPhotoDTOs(photos)
+					.build();
+				list.add(build);
+		}
+		
+		return list;
+	}
+
+}

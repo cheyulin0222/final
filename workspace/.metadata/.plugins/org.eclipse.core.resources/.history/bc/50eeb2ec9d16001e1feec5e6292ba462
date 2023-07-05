@@ -1,0 +1,33 @@
+package com.example.demo.service;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.example.demo.model.PostComment;
+import com.example.demo.model.PostCommentRepository;
+
+@Service
+public class PostCommentService {
+
+	@Autowired
+	private PostCommentRepository pDao;
+	
+	public PostComment add(PostComment postComment) {
+		return pDao.save(postComment);
+	}
+	
+	public List<PostComment> findByPostId(Integer postId) {
+		return pDao.findPostCmmentListByPostId(postId);
+	}
+	
+	public PostComment findById(Integer id) {
+		Optional<PostComment> option = pDao.findById(id);
+		return option.get();
+		
+		
+	}
+	
+}

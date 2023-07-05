@@ -1,0 +1,53 @@
+package com.example.demo.controller;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.example.demo.model.Member;
+import com.example.demo.model.Post;
+import com.example.demo.model.PostComment;
+import com.example.demo.service.PostCommentService;
+
+import jakarta.servlet.http.HttpSession;
+
+@Controller
+public class PostCommentController {
+	
+	@Autowired
+	private PostCommentService pService;
+	
+	@PostMapping("/postComment/post")
+	public String add(Integer postId, String text, HttpSession session) {
+		Member m = (Member) session.getAttribute("loginMember");
+		Post post = new Post();
+		post.setPostId(postId);
+		
+		PostComment comment = new PostComment();
+		comment.setMember(m);
+		comment.setPost(post);
+		comment.setText(text);
+		
+		pService.add(comment);
+		
+		return "redirect:/post/getAll";
+	}
+	
+	@ResponseBody
+	@PostMapping("/postComment/postnew")
+	public List<PostComment> post(@RequestBody PostComment comment) {
+		Member m = new Member();
+		m.setMemberId(1);
+		
+		comment.setMember(m);
+		pService.add(comment);
+		
+		Post post = comment.getPost();
+		Integer postId = post.getPostId();
+		return pService.findByPostId(postId);
+	}
+}

@@ -1,0 +1,45 @@
+package com.example.demo.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.NonNull;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
+import com.example.demo.model.Member;
+import com.example.demo.model.Post;
+import com.example.demo.model.PostLike;
+import com.example.demo.service.MemberService;
+import com.example.demo.service.PostLikeService;
+
+import jakarta.servlet.http.HttpServletRequest;
+
+@Controller
+public class PostLikeController {
+
+	@Autowired
+	private PostLikeService pService;
+	
+	private MemberService mService;
+	
+	@GetMapping("/postLike/post")
+	public String insert(@RequestBody PostLike like, @NonNull HttpServletRequest request) {
+		mService.findIdByJwt(null);
+		
+		
+		like.setMember(member);
+		like.setPost(post);
+		
+		pService.insert(like);
+		
+		return "redirect:/post/getAll";
+		
+	}
+	
+	@GetMapping("/postLike/delete")
+	public String delete(Integer postLikeId) {
+		pService.deleteById(postLikeId);
+		
+		return "redirect:/post/getAll";
+	}
+}

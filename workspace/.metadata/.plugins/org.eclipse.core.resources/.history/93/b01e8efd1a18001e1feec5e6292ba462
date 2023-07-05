@@ -1,0 +1,46 @@
+package com.example.demo.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.NonNull;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.example.demo.model.Member;
+import com.example.demo.model.PostLike;
+import com.example.demo.model.PostLikeDTO;
+import com.example.demo.service.MemberService;
+import com.example.demo.service.PostLikeService;
+
+import jakarta.servlet.http.HttpServletRequest;
+
+@RestController
+public class PostLikeController {
+
+	@Autowired
+	private PostLikeService pService;
+	@Autowired
+	private MemberService mService;
+
+	@PostMapping("/postLike/post")
+	public PostLikeDTO insert(@RequestBody PostLike like, @NonNull HttpServletRequest request) {
+		Integer memberid = mService.findIdByJwt(request);
+		Member member = new Member();
+		member.setMemberId(memberid);
+
+		like.setMember(member);
+
+		PostLike newLike = pService.insert(like);
+
+		return PostLikeDTO.builder().postLikeId(newLike.getPostLikeId()).build();
+
+	}
+
+	@DeleteMapping("/postLike/delete")
+	public void delete(@RequestParam Integer postLikeId) {
+		pService.deleteById(postLikeId);
+
+	}
+}

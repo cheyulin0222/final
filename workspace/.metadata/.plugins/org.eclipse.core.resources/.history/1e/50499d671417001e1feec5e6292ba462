@@ -1,0 +1,101 @@
+package com.example.demo.service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.NonNull;
+import org.springframework.stereotype.Service;
+
+import com.example.demo.config.JwtService;
+import com.example.demo.model.MemberRepository;
+import com.example.demo.model.Post;
+import com.example.demo.model.PostComment;
+import com.example.demo.model.PostCommentDTO;
+import com.example.demo.model.PostCommentLike;
+import com.example.demo.model.PostDTO;
+import com.example.demo.model.PostPhoto;
+import com.example.demo.model.PostPhotoDTO;
+import com.example.demo.model.PostRepository;
+
+import jakarta.servlet.http.HttpServletRequest;
+
+@Service
+public class PostService {
+	
+	@Autowired
+	private PostRepository pDao;
+	
+	@Autowired
+	private MemberRepository mDao;
+	
+	@Autowired
+	private JwtService jwtService;
+	
+	public Post insertPost(Post post) {
+		return pDao.save(post);
+	}
+	
+	public PostDTO findPostById(Integer id, @NonNull HttpServletRequest request) {
+		final String authHeader = request.getHeader("Authorization");
+		final String jwt = authHeader.substring(7);
+		final String useremail = jwtService.extractUsername(jwt);
+		var member = mDao.findByEmail(useremail)
+				.orElseThrow();
+		Integer memberid = member.getMemberId();
+		
+		
+		Optional<Post> option = pDao.findById(id);
+		
+		if (option.isPresent()) {
+			
+			Post oldPost = option.get();
+			
+			List<PostPhotoDTO>  photoList = new ArrayList<PostPhotoDTO>();
+			for (PostPhoto postPhoto : oldPost.getPostPhotos()) {
+				PostPhotoDTO build = PostPhotoDTO.builder()
+					.postPhotoId(postPhoto.getPostPhotoId())
+					.postPhotoFile(postPhoto.getPostPhotoFile())
+					.build();
+				
+				photoList.add(build);
+			}
+			
+			ArrayList<PostCommentDTO> commentList = new ArrayList<PostCommentDTO>();
+			for (PostComment comment : oldPost.getPostComments()) {
+				for (PostCommentLike like : comment.getPostCommentLikes()) {
+					if (memberid == like.getMember().getMemberId()) {
+						comment.setMyLikeId(like.getPostCommentLikeId());
+					}
+				}
+				PostCommentDTO build = PostCommentDTO.builder()
+					.postCommentId(comment.getPostCommentId())
+					.text(comment.getText())
+					.date(comment.getDate())
+					.myLikeId(comment.getMyLikeId())
+					.firstname(comment.getMember().getFirstname())
+					.memberPhoto(comment.getMember().getMemberPhoto())
+					.build();
+				commentList.add(build);
+			}
+			
+			return PostDTO.builder()
+				.postId(oldPost.getPostId())
+				.location(oldPost.getLocation())
+				.firstname(oldPost.getMember().getFirstname())
+				.memberPhoto(oldPost.getMember().getMemberPhoto())
+				.postPhooDTOs(photoList)
+				.postCommentDTOs(commentList)
+				.build();
+				
+		}
+		
+		return null;
+	}
+	
+	public List<Post> listAllPost() {
+		return pDao.findAll();
+	}
+
+}

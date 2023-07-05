@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>首頁</title>
+<link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+<style>
+        * {
+            margin: 0;
+        }
+
+        html, body {
+            height: 100%;
+            margin: 0;
+        }
+        body {
+            display: flex; /*使物件依序排列*/
+            flex-direction: column;/*使物件垂直排列*/
+        }
+        main {
+            flex-grow: 1;
+        }
+
+        header {
+            margin-bottom: 75px;
+        }
+        
+   
+
+        .card {
+            width: 460px;
+        }
+
+        .card-header {
+            padding-left: 0;
+            padding-right: 0;
+            background-color: white;
+            border: 0;
+            display: flex;
+
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+        }
+        
+        .comment-user-profile {
+            display: flex;
+            align-items: flex-start;
+            margin: 10px;
+        }
+
+        .user-info {
+            margin-left: 10px;
+        }
+
+        .icon-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .icon {
+            width: 25px;
+            margin-bottom: 10px;
+        }
+
+        .front-icons .icon {
+            margin-right: 10px;   
+        }
+
+        .card-body {
+            padding-right: 0;
+            padding-left: 0;
+            padding-top: 10px;
+        }
+
+        .test-title {
+            margin: 0;
+            font-weight: 400;
+            color:black
+        }
+        .test {
+            margin: 0;
+            font-size:small;
+            font-weight: 300;
+            color: grey;
+        }
+
+        .a {
+            position: absolute;
+            background-color: black;
+            color: white;
+            font-size: 30px;
+            line-height: 30px;
+            right:15px;
+            top:12px;
+        }
+
+
+        .circleImg{
+            border-radius: 50%;
+            width:45px;
+            min-height: 45px;
+            object-fit: cover;
+
+            /* height:45px; */
+        }
+
+        .testaaa {
+            width:460px;
+            min-height: 460px;
+             object-fit: cover;
+        }
+        
+        .single-post-photo {
+            width:500px;
+            min-height: 500px;
+             object-fit: cover;
+        }
+        .modal-content-flex {
+        	display: flex;
+        	align-items: center;
+        }
+        
+		.mytable {
+			width: 482px;
+			height: 200px;
+			overflow: auto;
+		}     
+		
+    </style>
+</head>
+<body>
+<header>
+<nav class="navbar fixed-top navbar-expand-lg navbar-light bg-light">
+<div class="container">
+  <a class="navbar-brand" th:href="@{/}">Navbar</a>
+  <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+    
+    <div class="navbar-nav ms-auto">
+    	<a class="nav-link" th:href="@{/messages/ajaxdemo}">ajaxdemo</a>
+    	<a class="nav-link active" aria-current="page" th:href="@{/post/getAll}">全部貼文</a>
+    	<th:block th:switch="${session.loginMember == null}">
+      		<a th:case=${true} class="nav-link active" aria-current="page" th:href="@{/member/login}">登入</a>
+      		<a th:case=${false} class="nav-link active" aria-current="page" th:href="@{/member/login}">登出</a>
+      	</th:block>
+     </div>
+  </div>
+</div>
+</nav>
+</header>
+	
+	
+<script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+</body>
+</html>

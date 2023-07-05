@@ -1,0 +1,43 @@
+package com.example.demo.controller;
+
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.NonNull;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.example.demo.model.PostCommentComment;
+import com.example.demo.model.PostCommentCommentDTO;
+import com.example.demo.service.PostCommentCommentService;
+
+import jakarta.servlet.http.HttpServletRequest;
+
+@RestController
+public class PostCommentCommentController {
+
+	@Autowired
+	private PostCommentCommentService pService;
+	
+	@PostMapping("/postCommentComment/post")
+	public PostCommentCommentDTO post(@RequestBody PostCommentComment comment, @NonNull HttpServletRequest request) {
+		PostCommentComment old = pService.add(comment, request);
+		return PostCommentCommentDTO.builder()
+			.postCommentCommentId(old.getPostCommentCommentId())
+			.text(old.getText())
+			.date(old.getDate())
+			.firstname(old.getMember().getFirstname())
+			.memberPhoto(old.getMember().getMemberPhoto())
+			.build();
+	}
+	
+	@GetMapping("/postCommentComment/get")
+	public List<PostCommentCommentDTO> get(@RequestParam Integer postCommentId, @NonNull HttpServletRequest request) {
+		
+		return pService.findPostCommentByPostId(postCommentId, request);
+	}
+}

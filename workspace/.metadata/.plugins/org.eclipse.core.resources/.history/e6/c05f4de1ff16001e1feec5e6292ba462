@@ -1,0 +1,24 @@
+package com.example.demo.model;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+public class PostDTO {
+
+	private Integer postId;
+	private String location;
+	private String firstname;
+	private byte[] memberPhoto;
+	private List<Byte[]> postPhotoFiles = new ArrayList<>();
+	private List<PostCommentDTO> postCommentDTOs = new ArrayList<>();;
+	
+}

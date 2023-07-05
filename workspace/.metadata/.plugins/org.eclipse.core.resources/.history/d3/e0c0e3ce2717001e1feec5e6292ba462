@@ -1,0 +1,62 @@
+package com.example.demo.service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.example.demo.model.Post;
+import com.example.demo.model.PostDTO;
+import com.example.demo.model.PostPhoto;
+import com.example.demo.model.PostPhotoDTO;
+import com.example.demo.model.PostRepository;
+
+@Service
+public class PostService {
+	
+	@Autowired
+	private PostRepository pDao;
+	
+	public Post insertPost(Post post) {
+		return pDao.save(post);
+	}
+	
+	public PostDTO findPostById(Integer id) {
+		
+		
+		Optional<Post> option = pDao.findById(id);
+		
+		if (option.isPresent()) {
+			
+			Post oldPost = option.get();
+			
+			List<PostPhotoDTO>  photoList = new ArrayList<PostPhotoDTO>();
+			for (PostPhoto postPhoto : oldPost.getPostPhotos()) {
+				PostPhotoDTO build = PostPhotoDTO.builder()
+					.postPhotoId(postPhoto.getPostPhotoId())
+					.postPhotoFile(postPhoto.getPostPhotoFile())
+					.build();
+				
+				photoList.add(build);
+			}
+			
+			return PostDTO.builder()
+				.postId(oldPost.getPostId())
+				.location(oldPost.getLocation())
+				.firstname(oldPost.getMember().getFirstname())
+				.memberPhoto(oldPost.getMember().getMemberPhoto())
+				.postPhotoDTOs(photoList)
+				.build();
+				
+		}
+		
+		return null;
+	}
+	
+	public List<PostDTO> listAllPost() {
+		return pDao.findAll();
+	}
+
+}

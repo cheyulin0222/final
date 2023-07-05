@@ -1,0 +1,45 @@
+package com.example.demo.service;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
+import com.example.demo.controller.MemberDTO;
+import com.example.demo.model.Follow;
+import com.example.demo.model.FollowRepository;
+
+import lombok.RequiredArgsConstructor;
+
+@Service
+@RequiredArgsConstructor
+public class FollowService {
+
+	private final FollowRepository fDao;
+	
+	public List<Follow> findByFollowerid(Integer memberid) {
+		return fDao.findByFollowerid(memberid);
+	}	
+	
+	
+	public List<Integer> extractFollowingID(List<Follow> oldList) {
+		List<Integer> newList = new ArrayList<Integer>();
+		
+		for (Follow follow : oldList) 
+			newList.add(follow.getFollowing().getMemberId());
+		
+		return newList;
+	}
+	
+	public Follow add(Follow follow) {
+		return fDao.save(follow);
+	}
+	
+	public void delete(Integer id) {
+		fDao.deleteById(id);
+	}
+	
+	public List<MemberDTO> followListToMemberDTO(List<Follow> oldList) P
+	
+	
+}
